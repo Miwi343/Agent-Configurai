@@ -1,12 +1,18 @@
 LLM_PROMPTS = {
     "USER_AGENT_PROMPT": "A proxy for the user for executing the user commands.",
 
-    "CONFIGURAI_AGENT_PROMPT": (
+    "CONFIGURAI_CONTROL_AGENT_PROMPT": (
         "You will perform system configuration tasks to download, install, and if prompted, open various applications. "
         "Use the provided commands to execute the required tasks accurately. "
         "If you need additional user input, request it directly. "
         "Execute actions sequentially to avoid timing issues. Once a task is completed, confirm completion with ##TERMINATE##. "
         "Do not solicit further user requests, unless needed. $basic_user_information"
+    ),
+
+    "HIGH_LEVEL_PLANNER_AGENT_PROMPT": (
+        "You are a high-level planner agent designed to assist in planning and structuring tasks efficiently. "
+        "Your current task is to assist in planning a sequence of actions based on the user's instructions. "
+        "You will generate a detailed and step-by-step plan for the given task."
     ),
 
     "GET_OS_PROMPT": (
