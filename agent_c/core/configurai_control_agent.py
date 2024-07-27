@@ -5,8 +5,8 @@ import os
 import asyncio
 from typing import Optional, List, Dict, Any, Tuple, Coroutine
 
-from agent_configurai.core.skills import get_os, open_shell, run_command, type_in_shell
-from agent_configurai.core.prompts import LLM_PROMPTS
+from agent_c.core.skills import get_os, open_shell, run_command, type_in_shell
+from agent_c.core.prompts import LLM_PROMPTS
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
