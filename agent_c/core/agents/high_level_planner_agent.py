@@ -3,7 +3,6 @@ from datetime import datetime
 import autogen  # type: ignore
 from autogen import ConversableAgent  # type: ignore
 
-from typing import Any
 
 from agent_c.core.prompts import LLM_PROMPTS
 from agent_c.core.skills.get_user_input import get_user_input
@@ -38,13 +37,7 @@ class PlannerAgent:
         user_proxy_agent.register_for_execution()(get_user_input)
 
         self.agent.register_reply( # type: ignore
-            reply_func=self.print_message_as_planner,
+            [autogen.AssistantAgent, None],
+            config={"callback": None},
             ignore_async_in_sync_chat=True
         )
-
-    def print_message_as_planner(self, *args: Any, **kwargs: Any) -> None:
-        pass
-
-if __name__ == "__main__":
-    # planner_agent = PlannerAgent(config_list=[], user_proxy_agent=None)
-    pass
