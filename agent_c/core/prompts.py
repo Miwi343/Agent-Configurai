@@ -1,19 +1,15 @@
 LLM_PROMPTS = {
-    "USER_AGENT_PROMPT": "A proxy for the user for executing the user commands.",
+    "CONTROL_AGENT_PROMPT": '''For tasks, use the functions provided to navigate throughout the shell and run commands. Reply with the output of the terminal followed by TEMINATE.''',
 
-    "CONFIGURAI_CONTROL_AGENT_PROMPT": (
-        "You will perform system configuration tasks to download, install, and if prompted, open various applications. "
-        "Use the provided commands to execute the required tasks accurately. "
-        "If you need additional user input, request it directly. "
-        "Execute actions sequentially to avoid timing issues. Once a task is completed, confirm completion with ##TERMINATE##. "
-        "Do not solicit further user requests, unless needed. $basic_user_information"
-    ),
-
-    "HIGH_LEVEL_PLANNER_AGENT_PROMPT": (
-        "You are a high-level planner agent designed to assist in planning and structuring tasks efficiently. "
-        "Your current task is to assist in planning a sequence of actions based on the user's instructions. "
-        "You will generate a detailed and step-by-step plan for the given task."
-    ),
+    "PLANNER_AGENT_PROMPT":'''You are a task planner. Given a task description, you will break it down into subtasks.
+    You will replay with a well-formed JSON and nothing else.
+    The JSON should contain the following keys:
+    - "plan" : a string with numbered sequence of subtasks. Needed when no plan exists or current plan needs to be updated.
+    - "terminate" : a string with value "yes" if the task is complete, else "no". Only terminate when you have reached the final answer.,
+    - "next_step" : a string with description of the next step to be taken, consistent with the plan. Only relevant when "terminate" is "no"
+    next_step is delegated to a helper agent for execution (if terminate is no). Helper agent is specialised to do basic shell operations such as get the operating system, get user input, open the shell, type a command in the shell, and run a command. So, do not do run any commands yourself, instead make the helper agent execute plans for you.
+    Helper agent is stateless and will not remember any context from previous interactions. So include all relevant details at each step.
+    ''',
 
     "GET_OS_PROMPT": (
         "This skill retrieves the operating system information of the user's machine. "
@@ -35,5 +31,10 @@ LLM_PROMPTS = {
     "RUN_COMMAND_PROMPT": (
         "This skill executes the typed commands in the terminal that is already opened on the user's machine. "
         "Ensure the commands are executed accurately and return the status of execution, including any output or error messages."
-    )
+    ),
+
+    "CAPTURE_OUTPUT_PROMPT": (
+        "This skill captures the output of the commands executed in the terminal. "
+        "Returns the output and error messages from the terminal."
+    ),
 }

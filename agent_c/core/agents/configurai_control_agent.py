@@ -1,68 +1,56 @@
-from datetime import datetime
+from utils.autogen_config import getautogenconfig
 
-import autogen  # type: ignore
-
-
+import autogen # type: ignore
 from agent_c.core.skills.get_os import get_os
+from agent_c.core.skills.get_user_input import get_user_input
 from agent_c.core.skills.open_shell import open_shell
 from agent_c.core.skills.run_command import run_command
 from agent_c.core.skills.type_in_shell import type_in_shell
-from agent_c.core.skills.get_user_input import get_user_input 
+from agent_c.core.skills.capture_output import capture_output
 
 from agent_c.core.prompts import LLM_PROMPTS
 
+class ControlAgent:
+    def __init__(self, name="controlagent"): # type: ignore
+        self.name = name
+        self.system_message = LLM_PROMPTS["Control_Agent_Prompt"]
+        self.config_list = getautogenconfig() # type: ignore
+        self.number_of_rounds = 10
 
-class ConfiguraiControlAgent:
-    def __init__(self, config_list, shell_nav_executor: autogen.UserProxyAgent): # type: ignore
-        """
-        Initialize the ControlAgent and store the AssistantAgent instance
-        as an instance attribute for external access.
-
-        Parameters:
-        - config_list: A list of configuration parameters required for AssistantAgent.
-        - user_proxy_agent: An instance of the UserProxyAgent class.
-        """
-        self.shell_nav_executor = shell_nav_executor 
-        system_message = LLM_PROMPTS["CONFIGURAI_CONTROL_AGENT_PROMPT"]
-        system_message = system_message + "\n" + f"Today's date is {datetime.now().strftime('%d %B %Y')}"
-
-
-        self.agent = autogen.ConversableAgent(
-            name="configurai_control_agent",
-            system_message=system_message,
-            llm_config={
-                "config_list": config_list,
-                "cache_seed": 2,
-                "temperature": 0.0
-            },
+        print("Creating Configurai Control Agent")
+        self.controlagent = autogen.AssistantAgent( # type: ignore
+            name=self.name,
+            system_message=self.system_message,
+            llm_config=self.config_list, # type: ignore
         )
+        self.shell_executor = autogen.UserProxyAgent( # type: ignore
+            name="shell_proxy",
+            is_termination_msg=lambda x: x.get("content", "") and x.get("content", "").rstrip().endswith("TERMINATE"), # type: ignore
+            human_input_mode="NEVER",
+            max_consecutive_auto_reply=self.number_of_rounds,
+            code_execution_config={
+                "work_dir": "coding",
+                "use_docker": False,
+            }, 
+        )
+        self.register_skills()
 
-        self.__register_skills()
+    def register_skills(self):
+        self.controlagent.register_for_llm(description=LLM_PROMPTS["GET_OS_PROMPT"])(get_os) # type: ignore
+        self.shell_executor.register_for_execution()(get_os) # type: ignore
 
-    def __register_skills(self):
-        # Register get_os skill for LLM by assistant agent
-        self.agent.register_for_llm(description=LLM_PROMPTS["GET_OS_PROMPT"])(get_os)
-        # Register get_os skill for execution by user_proxy_agent
-        self.shell_nav_executor.register_for_execution()(get_os)
+        self.controlagent.register_for_llm(description=LLM_PROMPTS["GET_USER_INPUT_PROMPT"])(get_user_input) # type: ignore
+        self.shell_executor.register_for_execution()(get_user_input) # type: ignore
 
-        # Register open_shell skill for LLM by assistant agent
-        self.agent.register_for_llm(description=LLM_PROMPTS["OPEN_SHELL_PROMPT"])(open_shell)
-        # Register open_shell skill for execution by user_proxy_agent
-        self.shell_nav_executor.register_for_execution()(open_shell)
+        self.controlagent.register_for_llm(description=LLM_PROMPTS["OPEN_SHELL_PROMPT"])(open_shell) # type: ignore
+        self.shell_executor.register_for_execution()(open_shell) # type: ignore
 
-        # Register run_command skill for LLM by assistant agent
-        self.agent.register_for_llm(description=LLM_PROMPTS["RUN_COMMAND_PROMPT"])(run_command)
-        # Register run_command skill for execution by user_proxy_agent
-        self.shell_nav_executor.register_for_execution()(run_command)
+        self.controlagent.register_for_llm(description=LLM_PROMPTS["RUN_COMMAND_PROMPT"])(run_command) # type: ignore
+        self.shell_executor.register_for_execution()(run_command) # type: ignore
 
-        # Register type_in_shell skill for LLM by assistant agent
-        self.agent.register_for_llm(description=LLM_PROMPTS["TYPE_IN_SHELL_PROMPT"])(type_in_shell)
-        # Register type_in_shell skill for execution by user_proxy_agent
-        self.shell_nav_executor.register_for_execution()(type_in_shell)
+        self.controlagent.register_for_llm(description=LLM_PROMPTS["TYPE_IN_SHELL_PROMPT"])(type_in_shell) # type: ignore
+        self.shell_executor.register_for_execution()(type_in_shell) # type: ignore
 
-        # Register get_user_input skill for LLM by assistant agent
-        self.agent.register_for_llm(description=LLM_PROMPTS["GET_USER_INPUT_PROMPT"])(get_user_input)
-        # Register get_user_input skill for execution by user_proxy_agent
-        self.shell_nav_executor.register_for_execution()(get_user_input)
-
-        # print(f">>> Function map: {self.shell_nav_executor.function_map}") # type: ignore
+        self.controlagent.register_for_llm(description=LLM_PROMPTS["CAPTURE_OUTPUT_PROMPT"])(capture_output) # type: ignore
+        self.shell_executor.register_for_execution()(capture_output)    # type: ignore
+        
