@@ -12,11 +12,16 @@ async def run_command(command: Annotated[str, "Command to execute"]) -> Annotate
             do script "{command}" in front window
         end tell
         '''
+        # Start process to execute the command
         process = await asyncio.create_subprocess_exec(
             'osascript', '-e', applescript_command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
+        # Wait for the process to finish and get the output
+        stdout, stderr = await process.communicate()
+        return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
+
     elif system == "Linux":  # Linux
         bash_command = f'gnome-terminal -- bash -c "{command}; exec bash"'
         process = await asyncio.create_subprocess_exec(
@@ -24,6 +29,11 @@ async def run_command(command: Annotated[str, "Command to execute"]) -> Annotate
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
+
+        # Wait for the process to finish and get the output
+        stdout, stderr = await process.communicate()
+        return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
+    
     elif system == "Windows":  # Windows
         powershell_command = f'Enter-PSSession -Name mysession; {command}'
         process = await asyncio.create_subprocess_exec(
@@ -31,11 +41,13 @@ async def run_command(command: Annotated[str, "Command to execute"]) -> Annotate
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
+        
+        # Wait for the process to finish and get the output
+        stdout, stderr = await process.communicate()
+        return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
     else:
         raise OSError(f"Unsupported platform: {system}")
 
-    stdout, stderr = await process.communicate()
-    return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
 
 if __name__ == "__main__":
     command = "echo Hello World"

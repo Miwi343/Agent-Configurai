@@ -3,8 +3,8 @@ from utils.autogen_config import getautogenconfig
 import autogen # type: ignore
 import json 
 
-from agent_c.core.prompts import LLM_PROMPTS
-from agent_c.core.agents.configurai_control_agent import ControlAgent
+from core.prompts import LLM_PROMPTS
+from core.agents.configurai_control_agent import ControlAgent
 
 class PlannerAgent:
     def __init__(self, name="planneragent"): # type: ignore

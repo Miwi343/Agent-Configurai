@@ -1,5 +1,7 @@
 LLM_PROMPTS = {
-    "CONTROL_AGENT_PROMPT": '''For tasks, use the functions provided to navigate throughout the shell and run commands. Reply with the output of the terminal followed by TEMINATE.''',
+    "CONTROL_AGENT_PROMPT": '''For each task recieved from the planner, run the equivalent skill or shell command. 
+    Use the shell_proxy to run the task, and then return the output to the planner. Do not talk to the user or the shell proxy
+    Reply with the output of the terminal followed by TERMINATE. ''',
 
     "PLANNER_AGENT_PROMPT":'''You are a task planner. Given a task description, you will break it down into subtasks.
     You will replay with a well-formed JSON and nothing else.
@@ -7,8 +9,8 @@ LLM_PROMPTS = {
     - "plan" : a string with numbered sequence of subtasks. Needed when no plan exists or current plan needs to be updated.
     - "terminate" : a string with value "yes" if the task is complete, else "no". Only terminate when you have reached the final answer.,
     - "next_step" : a string with description of the next step to be taken, consistent with the plan. Only relevant when "terminate" is "no"
-    next_step is delegated to a helper agent for execution (if terminate is no). Helper agent is specialised to do basic shell operations such as get the operating system, get user input, open the shell, type a command in the shell, and run a command. So, do not do run any commands yourself, instead make the helper agent execute plans for you.
-    Helper agent is stateless and will not remember any context from previous interactions. So include all relevant details at each step.
+    next_step is delegated to a helper control agent for execution (if terminate is no). Control agent is specialised to do basic shell operations such as get the operating system, open the shell, type a command in the shell, and run a command. So, do not do run any commands yourself, instead make the helper agent execute plans for you.
+    Helper agent is stateless and will not remember any context from previous interactions. So include all relevant details at each step. The control agent will return the output of the command followed by TERMINATE. Based on the output of each step, be prepared to update the plan and provide the next step.
     ''',
 
     "GET_OS_PROMPT": (
