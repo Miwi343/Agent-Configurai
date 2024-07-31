@@ -37,8 +37,8 @@ class PlannerAgent:
             self.planner_executor.register_nested_chats( # type: ignore
             [
                 {
-                "sender": self.nested_agent.shell_executor, # type: ignore
-                "recipient": self.nested_agent.controlagent, # type: ignore
+                "sender": self.nested_agent.controlagent, # type: ignore
+                "recipient": self.nested_agent.shell_executor, # type: ignore
                 "message":self.reflection_message, # type: ignore
                 "max_turns": self.number_of_rounds,
                 "summary_method": self.my_custom_summary_method, # type: ignore

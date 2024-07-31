@@ -1,59 +1,26 @@
 from typing import Annotated
-import platform
-import asyncio
+import subprocess
 
-async def run_command(command: Annotated[str, "Command to execute"]) -> Annotated[str, "Command execution status"]:
-    system = platform.system()
+def run_command(terminal_id: Annotated[str, "Terminal ID"], command: Annotated[str, "Command to execute"]) -> Annotated[str, "Command execution status"]:
+    """
+    Executes a shell command in a specified terminal and returns the output.
 
-    if system == "Darwin":  # macOS
-        applescript_command = f'''
-        tell application "Terminal"
-            activate
-            do script "{command}" in front window
-        end tell
-        '''
-        # Start process to execute the command
-        process = await asyncio.create_subprocess_exec(
-            'osascript', '-e', applescript_command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        # Wait for the process to finish and get the output
-        stdout, stderr = await process.communicate()
-        return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
+    Parameters:
+    terminal_id (str): Identifier for the terminal in which the command should be run.
+    command (str): The shell command to execute.
 
-    elif system == "Linux":  # Linux
-        bash_command = f'gnome-terminal -- bash -c "{command}; exec bash"'
-        process = await asyncio.create_subprocess_exec(
-            'bash', '-c', bash_command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-        # Wait for the process to finish and get the output
-        stdout, stderr = await process.communicate()
-        return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
-    
-    elif system == "Windows":  # Windows
-        powershell_command = f'Enter-PSSession -Name mysession; {command}'
-        process = await asyncio.create_subprocess_exec(
-            'powershell.exe', '-Command', powershell_command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        
-        # Wait for the process to finish and get the output
-        stdout, stderr = await process.communicate()
-        return f"Command '{command}' executed. Output: {stdout.decode()}, Error: {stderr.decode()}"
-    else:
-        raise OSError(f"Unsupported platform: {system}")
-
+    Returns:
+    str: The output from the terminal after running the command.
+    """
+    try:
+        result = subprocess.run(['./run_command', terminal_id, command], capture_output=True, text=True)
+        return result.stdout
+    except Exception as e:
+        return str(e)
 
 if __name__ == "__main__":
-    command = "echo Hello World"
+    terminal_id = "79335"  # Example terminal ID
+    command = "ls"
     
-    async def main():
-        status = await run_command(command)
-        print(status)
-
-    asyncio.run(main())
+    output = run_command(terminal_id, command)
+    print(output)

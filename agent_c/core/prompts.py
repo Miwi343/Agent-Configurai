@@ -1,9 +1,13 @@
 LLM_PROMPTS = {
-    "CONTROL_AGENT_PROMPT": '''For each task recieved from the planner, run the equivalent skill or shell command. 
-    Use the shell_proxy to run the task, and then return the output to the planner. Do not talk to the user or the shell proxy
-    Reply with the output of the terminal followed by TERMINATE. ''',
+    "CONTROL_AGENT_PROMPT": '''For each task recieved from the planner, run the equivalent skill or shell command using the terminal ID recieved from open_shell. 
+    Only run the step given by the planner agent, and nothing else.
+    Use the shell_executor to perform skills, and then return the output back to the planner. Do not talk to the user or the shell_executor.
+    After running a command, be sure to return the output of the command back to the planner agent. 
+    If recieved a TERMINATE, then stop the execution and return the final output to the planner agent.''',
 
-    "PLANNER_AGENT_PROMPT":'''You are a task planner. Given a task description, you will break it down into subtasks.
+    "PLANNER_AGENT_PROMPT":'''You are a task planner. Given a task description, you will break it down into the most detailed, thorough subtasks. 
+    Verify the control agent has the appropriate context to pass parameters in order to perform the skills.
+    Each step in the plan should be detailed enough that the control agent can execute it without any further information.
     You will replay with a well-formed JSON and nothing else.
     The JSON should contain the following keys:
     - "plan" : a string with numbered sequence of subtasks. Needed when no plan exists or current plan needs to be updated.
@@ -19,9 +23,14 @@ LLM_PROMPTS = {
     ),
 
     "OPEN_SHELL_PROMPT": (
-        "This skill opens a terminal or command prompt on the user's machine. "
-        "Ensure the terminal is opened successfully and is ready for further commands. "
-        "Returns a confirmation message if the terminal is opened successfully or an appropriate error message if it fails."
+        "This skill opens a terminal or command prompt on the user's machine based on the specified operating system. "
+        "Ensure the terminal is opened successfully and return the terminal ID for further commands. "
+        "Returns the terminal ID if the terminal is opened successfully or an appropriate error message if it fails."
+    ),
+
+    "RUN_COMMAND_PROMPT": (
+        "This skill executes the typed commands in the terminal that is already opened on the user's machine, using the specified terminal ID. "
+        "Ensure the commands are executed accurately and return the exact output from the terminal, including any output or error messages."
     ),
 
     "TYPE_IN_SHELL_PROMPT": (
@@ -30,10 +39,6 @@ LLM_PROMPTS = {
         "Returns the output and error messages from the terminal."
     ),
 
-    "RUN_COMMAND_PROMPT": (
-        "This skill executes the typed commands in the terminal that is already opened on the user's machine. "
-        "Ensure the commands are executed accurately and return the status of execution, including any output or error messages."
-    ),
 
     "CAPTURE_OUTPUT_PROMPT": (
         "This skill captures the output of the commands executed in the terminal. "
