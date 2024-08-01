@@ -1,10 +1,10 @@
 from typing import Any
-from utils.autogen_config import getautogenconfig
-import autogen # type: ignore
+from agent_c.utils.autogen_config import getautogenconfig
+import autogen  # type: ignore
 import json 
 
-from core.prompts import LLM_PROMPTS
-from core.agents.configurai_control_agent import ControlAgent
+from agent_c.core.prompts import LLM_PROMPTS
+from agent_c.core.agents.configurai_control_agent import ControlAgent
 
 class PlannerAgent:
     def __init__(self, name="planneragent"): # type: ignore
@@ -15,7 +15,7 @@ class PlannerAgent:
         self.hierarchial_execution = True
 
 
-        print("Creating Math Planner Agent")
+        print("Creating Configurai Planner Agent")
         self.planneragent = autogen.AssistantAgent( # type: ignore
             name=self.name,
             system_message=self.system_message,

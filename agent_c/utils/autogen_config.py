@@ -1,5 +1,6 @@
 import os
-from core.config import (AUTOGEN_MODEL_API_KEY, AUTOGEN_MODEL_NAME)
+from agent_c.core.config import (AUTOGEN_MODEL_API_KEY, AUTOGEN_MODEL_NAME)
+
 def getautogenconfig(): # type: ignore
     model_info ={}
     model_info["model"]= AUTOGEN_MODEL_NAME

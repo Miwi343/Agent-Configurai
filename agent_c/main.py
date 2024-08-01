@@ -1,8 +1,7 @@
 from autogen import Cache # type: ignore
 
 # from agent_c.core.agents.configurai_control_agent import ControlAgent
-from core.agents.configurai_planner_agent import PlannerAgent
-
+from agent_c.core.agents.configurai_planner_agent import PlannerAgent
 
 def system_orchestrator(): # type: ignore
     # Ask for user input for a shell navigation command

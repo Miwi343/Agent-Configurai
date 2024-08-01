@@ -1,14 +1,13 @@
-from utils.autogen_config import getautogenconfig
+from agent_c.utils.autogen_config import getautogenconfig
 
-import autogen # type: ignore
-from core.skills.get_os import get_os
-# from core.skills.get_user_input import get_user_input
-from core.skills.open_shell import open_shell
-from core.skills.run_command import run_command
-from core.skills.type_in_shell import type_in_shell
-# from core.skills.capture_output import capture_output
-
-from core.prompts import LLM_PROMPTS
+import autogen  # type: ignore
+from agent_c.core.skills.get_os import get_os
+# from agent_c.core.skills.get_user_input import get_user_input
+from agent_c.core.skills.open_shell import open_shell
+from agent_c.core.skills.run_command import run_command
+from agent_c.core.skills.type_in_shell import type_in_shell
+# from agent_c.core.skills.capture_output import capture_output
+from agent_c.core.prompts import LLM_PROMPTS
 
 class ControlAgent:
     def __init__(self, name="controlagent"): # type: ignore
@@ -47,6 +46,9 @@ class ControlAgent:
 
         self.controlagent.register_for_llm(description=LLM_PROMPTS["RUN_COMMAND_PROMPT"])(run_command) # type: ignore
         self.shell_executor.register_for_execution()(run_command) # type: ignore
+
+        #self.controlagent.register_for_llm(description=LLM_PROMPTS["TERMINAL_OUTPUT_PROMPT"])(get_terminal_output) # type: ignore
+        #self.shell_executor.register_for_execution()(get_terminal_output) # type: ignore
 
         self.controlagent.register_for_llm(description=LLM_PROMPTS["TYPE_IN_SHELL_PROMPT"])(type_in_shell) # type: ignore
         self.shell_executor.register_for_execution()(type_in_shell) # type: ignore
