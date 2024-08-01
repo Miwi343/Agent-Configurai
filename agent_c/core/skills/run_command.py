@@ -2,7 +2,7 @@ from typing import Annotated
 import subprocess
 import asyncio
 import platform
-from .get_terminal_output import get_terminal_output  # Absolute import
+import os
 
 async def run_command(terminal_id: Annotated[str, "Terminal ID"], command: Annotated[str, "Command to execute"]) -> Annotated[str, "Command Output"]:
     """
@@ -15,33 +15,14 @@ async def run_command(terminal_id: Annotated[str, "Terminal ID"], command: Annot
     Returns:
     str: The output from the terminal after running the command.
     """
-    os_type = platform.system()
     try:
-        # Run the command in the actual terminal
-        if os_type == "Darwin":  # macOS
-            run_script = f'''
-            tell application "Terminal"
-                do script "{command}" in window id {terminal_id}
-            end tell
-            '''
-            subprocess.run(['osascript', '-e', run_script], capture_output=True, text=True)
+        # Construct the absolute path to the bash script
+        script_path = os.path.join(os.path.dirname(__file__), 'run_command.sh')
+        
+        # Run the bash script with the terminal_id and command as arguments
+        result = subprocess.run([script_path, terminal_id, command], capture_output=True, text=True)
+        output = result.stdout.strip()
 
-        elif os_type == "Linux":  # Linux
-            subprocess.run(['gnome-terminal', '--', 'bash', '-c', command])
-
-        elif os_type == "Windows":  # Windows
-            run_script = f'Start-Process powershell -ArgumentList "{command}" -NoNewWindow -PassThru'
-            subprocess.run(['powershell', '-Command', run_script])
-
-        # Custom message for 'cd' command
-        if command.startswith("cd "):
-            directory = command[3:].strip()
-            # Actual terminal will execute the cd command without any output
-            output = f"Navigated successfully to {directory}"
-        else:
-            # Capture the output using get_terminal_output
-            output = await get_terminal_output(command)
-            
         return output
     except Exception as e:
         return str(e)
@@ -49,13 +30,13 @@ async def run_command(terminal_id: Annotated[str, "Terminal ID"], command: Annot
 if __name__ == "__main__":
     async def main():
         # Open a shell to get the terminal ID
-        from agent_c.core.skills.open_shell import open_shell
+        from open_shell import open_shell
         os_type = platform.system()
-        terminal_id = open_shell(os_type)
+        terminal_id =  open_shell(os_type)
         print(f"Opened terminal with ID: {terminal_id}")
 
         # List of commands to execute
-        commands = ["cd ~/Desktop", "ls -la"]  # Example commands
+        commands = ["ls", "cd ~/Desktop", "ls -la", "cd Projects/", "ls", "cd Miwi/"]  # Example commands
 
         # Run each command and print the output
         for command in commands:

@@ -1,7 +1,14 @@
+import sys
+import os
+
+# Add the 'Agent_Configurai' directory to the Python path
+root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(root_path)
+
 from autogen import Cache # type: ignore
 
 # from agent_c.core.agents.configurai_control_agent import ControlAgent
-from agent_c.core.agents.configurai_planner_agent import PlannerAgent
+from core.agents.configurai_planner_agent import PlannerAgent
 
 def system_orchestrator(): # type: ignore
     # Ask for user input for a shell navigation command

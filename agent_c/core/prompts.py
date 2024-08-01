@@ -28,11 +28,28 @@ LLM_PROMPTS = {
         "Returns the terminal ID if the terminal is opened successfully or an appropriate error message if it fails."
     ),
 
-    "RUN_COMMAND_PROMPT": (
-        "This skill executes the typed commands in the terminal that is already opened on the user's machine, using the specified terminal ID. "
-        "Ensure the commands are executed accurately and return the exact output from the terminal, including any output or error messages. "
-        "Additionally, call the get_terminal_output skill to capture and display the output in the VSCode terminal."
-    ),
+    "RUN_COMMAND_PROMPT":'''
+        This skill executes the typed commands in the terminal that is already opened on the user's machine, using the specified terminal ID. 
+        This script takes the terminal ID and command as arguments and returns the output of the command. 
+        The output of the command is formatted so that the first line is the terminal window id, followed by the status of the command (success or failure), and then the exact output of the command displayed in the terminal.
+        Example output returned for a ls command:
+            tab 1 of window id 84555
+            Command executed successfully
+            Applications
+            Desktop
+            Documents
+            Downloads
+            Library
+            Movies
+            Music
+            Pictures
+            Public
+            homebrew
+        Example output of a faulty cd command:
+            tab 1 of window id 84555
+            Command failed with status 1
+            cd: no such file or directory: /Users/username/Downloads/folder
+    ''',
 
     "TYPE_IN_SHELL_PROMPT": (
         "This skill types the necessary commands into the terminal that is already opened on the user's machine. "
